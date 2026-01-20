@@ -42,7 +42,7 @@
 
         .nav-icon { height: 20px; width: auto; vertical-align: middle; position: relative; top: -1px; }
 
-        /* 프리미엄 매물관 버튼 (NEW) */
+        /* [추가됨] 프리미엄 매물관 버튼 스타일 */
         .btn-premium {
             color: var(--chance-dark) !important;
             border: 2px solid var(--chance-dark);
@@ -137,6 +137,7 @@
             .fixed-qr { bottom: 10px; right: 10px; padding: 10px; }
             .fixed-qr img { width: 90px; }
             .nav-menu { flex-wrap: wrap; justify-content: center; }
+            /* 모바일에서 프리미엄 버튼 위치 조정 */
             .btn-premium { order: -1; margin-bottom: 10px; }
         }
     </style>
@@ -153,10 +154,12 @@
             <a href="https://www.youtube.com/@이호재-u3l" target="_blank"><img src="Youtube_logo.png" alt="유튜브" class="nav-icon">유튜브</a>
             
             <a href="https://sp.zigbang.com/share/store/908559?userNo=&stamp=260111211445" target="_blank">
-                <img src="zigbang.png" alt="직방" class="nav-icon">직방 매물</a>
+                <img src="zigbang.png" alt="직방" class="nav-icon">직방 매물(상가, 사무실)
+            </a>
 
             <a href="https://m.blog.naver.com/PostList.naver?blogId=chance4953&tab=1" target="_blank">
-                <img src="naverblog-logo.jpg" alt="블로그" class="nav-icon">네이버 블로그</a>
+                <img src="naverblog-logo.jpg" alt="블로그" class="nav-icon">네이버 블로그 매물
+            </a>
 
             <a href="https://naver.me/FhfVyegj" target="_blank"><img src="navermap.webp" alt="오시는 길" class="nav-icon">오시는 길</a>
             
@@ -235,7 +238,10 @@
         </div>
         <div class="copyright">
             <p>주소: 세종시 고운뜰7길9 더리치빌딩 109호</p>
-            <p>&copy; 2026 Chance Real Estate. All rights reserved.</p>
+            <p>
+                &copy; 2026 Chance Real Estate. All rights reserved.
+                <a href="/admin/" style="color: #555; margin-left: 10px; text-decoration: none;" title="관리자 로그인">🔒</a>
+            </p>
         </div>
     </footer>
 
