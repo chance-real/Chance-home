@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* 스타일 생략 (기존과 동일) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans KR', sans-serif; color: #333; line-height: 1.6; background-color: #f5f7fa; padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
@@ -83,8 +84,7 @@
 
     <script>
         // ==========================================
-        // [업데이트] 사장님 스크린샷에 있는 '진짜 게시 주소'입니다!
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgfWKmQ-Tjpm_mMdqKcgwvfVbCJZwl_HArZF3o6ZOjdR_1Xn3xvTlr1fwDw6EiDaaRo/pub?output=csv'; 
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1eowV-zcKf6EitkjY8WE5F3YvrES8ZKmXIGig_FEyoMs/pub?output=csv'; 
         // ==========================================
 
         function fixUrl(url) {
@@ -169,7 +169,10 @@
                 return;
             }
 
-            let imageList = item.images ? item.images.split('|').map(l=>convertDriveLink(l.trim())) : ['bg.jpg'];
+            // [수정완료] images(복수)로 변경
+            const imgCol = item.images || item.image || '';
+            let imageList = imgCol ? imgCol.split('|').map(l=>convertDriveLink(l.trim())) : ['bg.jpg'];
+            
             let thumbsHtml = '';
             imageList.forEach((url, idx) => {
                 thumbsHtml += `<div class="thumb-item ${idx===0?'active':''}" onclick="changeMainImage('${url}', this)"><img src="${url}"></div>`;
@@ -185,9 +188,11 @@
 
             let similarHtml = '';
             similarItems.forEach(sim => {
+                const simImgCol = sim.images || sim.image || '';
+                const simImgUrl = convertDriveLink(simImgCol.split('|')[0]);
                 similarHtml += `
                     <div class="similar-card" onclick="location.href='detail.html?title=' + encodeURIComponent('${sim.title}')">
-                        <div class="similar-img"><img src="${convertDriveLink(sim.images?sim.images.split('|')[0]:'')}" onerror="this.src='bg.jpg'"></div>
+                        <div class="similar-img"><img src="${simImgUrl}" onerror="this.src='bg.jpg'"></div>
                         <div class="similar-info">
                             <div class="similar-price">${sim.price}</div>
                             <div class="similar-title">${sim.title}</div>
