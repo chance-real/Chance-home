@@ -3,101 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>매물 상세 정보 - 찬스부동산</title>
+    <title>매물 상세 - 찬스부동산</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        /* 공통 스타일 */
+        /* [스타일] 네모 앱 스타일 적용 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Noto Sans KR', sans-serif; color: #333; line-height: 1.6; background-color: #fcfcfc; }
+        body { font-family: 'Noto Sans KR', sans-serif; color: #333; line-height: 1.6; background-color: #f5f7fa; padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
-        :root { --chance-blue: #2980b9; --chance-dark: #2c3e50; }
-
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 5%; border-bottom: 1px solid #eee;
-            background-color: white;
-        }
-        .logo img { height: 50px; width: auto; }
-        .btn-back { padding: 8px 15px; border: 1px solid #ddd; border-radius: 5px; font-weight: 700; }
-
-        /* 상세 페이지 레이아웃 */
-        .detail-container { max-width: 1000px; margin: 40px auto; padding: 30px; background: white; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); }
-
-        /* 이미지 갤러리 스타일 */
-        .gallery-container { margin-bottom: 30px; }
-        .main-image-box { 
-            width: 100%; height: 500px; /* 높이 고정 */
-            background: #eee; border-radius: 10px; overflow: hidden; margin-bottom: 10px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .main-image-box img { 
-            max-width: 100%; max-height: 100%; 
-            object-fit: contain; 
-        }
-        .thumbnail-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .thumb-box { 
-            width: 80px; height: 60px; flex-shrink: 0; border-radius: 5px; overflow: hidden; opacity: 0.6; cursor: pointer; transition: 0.3s; border: 2px solid transparent;
-        }
-        .thumb-box:hover, .thumb-box.active { opacity: 1; border-color: var(--chance-blue); }
-        .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* 기본 정보 */
-        .detail-header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px; }
-        .detail-status-badge { display: inline-block; padding: 5px 12px; background: var(--chance-dark); color: white; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; }
-        .detail-price { font-size: 2rem; font-weight: 900; color: var(--chance-blue); margin-bottom: 5px; }
-        .detail-title { font-size: 1.8rem; font-weight: 700; line-height: 1.3; }
-
-        /* 상세 정보 테이블 스타일 */
-        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 1.05rem; }
-        .info-table th { 
-            width: 25%; background: #f8f9fa; text-align: left; padding: 15px; 
-            border-top: 1px solid #eee; border-bottom: 1px solid #eee; color: #555; font-weight: 700;
-        }
-        .info-table td { 
-            width: 75%; padding: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; color: #222; font-weight: 500;
-        }
         
-        /* 상세 설명 박스 */
-        .desc-box { background: #fcfcfc; padding: 30px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 30px; }
-        .desc-box h3 { font-size: 1.3rem; margin-bottom: 20px; border-bottom: 2px solid var(--chance-blue); display: inline-block; padding-bottom: 5px; }
-        .detail-desc { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; }
+        /* 헤더 */
+        header { background: white; padding: 15px 5%; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
+        .logo img { height: 45px; }
+        .btn-back { font-weight: 700; color: #555; border: 1px solid #ddd; padding: 5px 12px; border-radius: 4px; background: white; }
+
+        /* 메인 컨테이너 */
+        .container { max-width: 800px; margin: 0 auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.03); }
+
+        /* 이미지 갤러리 */
+        .image-section { position: relative; background: #eee; height: 400px; overflow: hidden; }
+        .main-img { width: 100%; height: 100%; object-fit: cover; }
+        .img-badge { position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.8rem; }
         
-        /* 하단 버튼 */
-        .action-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 40px; }
-        .btn-action { 
-            flex: 1; padding: 18px; text-align: center; border-radius: 10px; font-weight: 700; font-size: 1.2rem; 
-            cursor: pointer; transition: 0.3s; text-decoration: none; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-blog { background-color: #03c75a; color: white; border: none; }
-        .btn-blog:hover { background-color: #02b351; }
-        .btn-call { background-color: var(--chance-blue); color: white; border: none; }
-        .btn-call:hover { background-color: #1c6ea4; }
+        .thumb-list { display: flex; gap: 8px; padding: 10px 20px; overflow-x: auto; background: white; border-bottom: 1px solid #f0f0f0; }
+        .thumb-item { width: 60px; height: 60px; border-radius: 4px; overflow: hidden; opacity: 0.5; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
+        .thumb-item.active { opacity: 1; border-color: #2980b9; }
+        .thumb-item img { width: 100%; height: 100%; object-fit: cover; }
 
-        .loading-msg { text-align: center; padding: 100px; color: #999; font-size: 1.2rem; }
+        /* 매물 기본 정보 (가격 등) */
+        .basic-info { padding: 30px 20px; border-bottom: 8px solid #f5f7fa; }
+        .cat-tag { color: #2980b9; font-weight: 700; font-size: 0.9rem; margin-bottom: 5px; display: block; }
+        .price-text { font-size: 2rem; font-weight: 900; color: #222; margin-bottom: 10px; line-height: 1.2; }
+        .title-text { font-size: 1.3rem; font-weight: 500; color: #444; margin-bottom: 20px; }
+        
+        /* [핵심] 아이콘 그리드 정보 (네모 스타일) */
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f9f9f9; padding: 20px; border-radius: 12px; }
+        .info-item { display: flex; align-items: center; gap: 12px; }
+        .info-icon { width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #777; border: 1px solid #eee; font-size: 1.1rem; flex-shrink: 0; }
+        .info-text div:first-child { font-size: 0.8rem; color: #888; margin-bottom: 2px; }
+        .info-text div:last-child { font-size: 0.95rem; font-weight: 700; color: #333; }
 
-        @media (max-width: 768px) {
-            .main-image-box { height: 300px; }
-            .info-table th, .info-table td { display: block; width: 100%; border: none; padding: 10px 0; }
-            .info-table th { background: transparent; color: #888; font-size: 0.9rem; margin-top: 10px; }
-            .info-table td { border-bottom: 1px solid #eee; font-weight: 700; padding-bottom: 15px; }
-            .action-buttons { flex-direction: column; }
-        }
+        /* 상세 설명 & 위치 */
+        .section { padding: 30px 20px; border-bottom: 8px solid #f5f7fa; }
+        .sec-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; color: #222; display: flex; align-items: center; gap: 8px; }
+        
+        .desc-box { background: white; line-height: 1.8; color: #555; white-space: pre-wrap; font-size: 1.05rem; }
+        
+        .map-box { background: #f8f9fa; border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #eee; }
+        .address-text { font-weight: 700; font-size: 1.1rem; margin-bottom: 15px; display: block; }
+        .btn-map { background: #2c3e50; color: white; padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; }
+
+        /* 비슷한 매물 추천 */
+        .similar-list { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; }
+        .similar-card { min-width: 160px; width: 160px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; cursor: pointer; }
+        .similar-img { height: 100px; background: #ddd; }
+        .similar-img img { width: 100%; height: 100%; object-fit: cover; }
+        .similar-info { padding: 10px; }
+        .similar-price { font-weight: 800; font-size: 0.95rem; color: #2980b9; margin-bottom: 3px; }
+        .similar-title { font-size: 0.85rem; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* 하단 고정 버튼 */
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 20px; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); display: flex; gap: 10px; z-index: 2000; }
+        .btn-action { flex: 1; height: 50px; border-radius: 8px; font-weight: 800; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+        .btn-call { background: #2980b9; color: white; }
+        .btn-blog { background: #03c75a; color: white; } /* 네이버 녹색 */
+        
+        .loading { text-align: center; padding: 100px; color: #999; }
     </style>
 </head>
 <body>
     <header>
         <div class="logo"><a href="index.html"><img src="logo.jpg" alt="찬스부동산"></a></div>
-        <a href="listings.html" class="btn-back">← 목록으로</a>
+        <a href="listings.html" class="btn-back">목록으로</a>
     </header>
 
-    <div id="detail-content" class="detail-container">
-        <div class="loading-msg">매물 정보를 불러오는 중입니다...</div>
+    <div id="app" class="container">
+        <div class="loading">매물 정보를 불러오는 중입니다...</div>
     </div>
 
     <script>
         // ==========================================
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSj9TOA__l0xoYFmfSGDJ8pfDzsGso0Iisub8EjjyGUaQJUaNIjVMp8qcWr6YIUxhuCU7Hj2EEBw31D/pub?output=csv'; 
         // ==========================================
+
+        // [중요] 네이버 블로그 링크 강제 연결 함수
+        function fixUrl(url) {
+            if (!url) return '';
+            let fixed = url.trim();
+            // http가 없으면 붙여줌 (이것 때문에 연결이 안 됐던 겁니다!)
+            if (!fixed.startsWith('http')) {
+                fixed = 'https://' + fixed;
+            }
+            return fixed;
+        }
 
         function getParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -111,7 +110,6 @@
             for(let i = 1; i < lines.length; i++) {
                 if(!lines[i]) continue;
                 const obj = {};
-                // CSV 파싱 로직 강화
                 const currentline = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
                 if(currentline) {
                     headers.forEach((header, j) => {
@@ -136,7 +134,7 @@
 
         function changeMainImage(url, element) {
             document.getElementById('main-img').src = url;
-            document.querySelectorAll('.thumb-box').forEach(box => box.classList.remove('active'));
+            document.querySelectorAll('.thumb-item').forEach(box => box.classList.remove('active'));
             element.classList.add('active');
         }
 
@@ -147,99 +145,117 @@
             .then(csvText => {
                 const allListings = csvToJSON(csvText);
                 const item = allListings.find(l => l.title === targetTitle);
-                renderDetail(item);
+                renderDetail(item, allListings);
             })
             .catch(error => {
                 console.error(error);
-                document.getElementById('detail-content').innerHTML = '<div class="loading-msg">정보를 불러올 수 없습니다.</div>';
+                document.getElementById('app').innerHTML = '<div class="loading">정보를 불러올 수 없습니다.</div>';
             });
 
-        function renderDetail(item) {
-            const container = document.getElementById('detail-content');
+        function renderDetail(item, allListings) {
             if (!item) {
-                container.innerHTML = '<div class="loading-msg">삭제되거나 존재하지 않는 매물입니다.</div>';
+                document.getElementById('app').innerHTML = '<div class="loading">존재하지 않는 매물입니다.</div>';
                 return;
             }
 
-            let imageList = [];
-            if(item.images) {
-                imageList = item.images.split('|').map(link => convertDriveLink(link.trim()));
-            } else if(item.image) {
-                imageList = [convertDriveLink(item.image)];
-            } else {
-                imageList = ['bg.jpg'];
-            }
-            
-            const mainImgUrl = imageList[0];
-
+            // 이미지 처리
+            let imageList = item.images ? item.images.split('|').map(l=>convertDriveLink(l.trim())) : ['bg.jpg'];
             let thumbsHtml = '';
-            if(imageList.length > 1) {
-                thumbsHtml = '<div class="thumbnail-strip">';
-                imageList.forEach((url, index) => {
-                    const activeClass = index === 0 ? 'active' : '';
-                    thumbsHtml += `
-                        <div class="thumb-box ${activeClass}" onclick="changeMainImage('${url}', this)">
-                            <img src="${url}" alt="썸네일 ${index+1}">
-                        </div>`;
-                });
-                thumbsHtml += '</div>';
-            }
+            imageList.forEach((url, idx) => {
+                thumbsHtml += `<div class="thumb-item ${idx===0?'active':''}" onclick="changeMainImage('${url}', this)"><img src="${url}"></div>`;
+            });
 
-            // [수정됨] 버튼을 'a' 태그로 변경하여 무조건 새 창으로 열리게 함 (공백 제거 기능 추가)
-            const cleanBlogUrl = item.blog_url ? item.blog_url.trim() : '';
-            const blogBtnHtml = cleanBlogUrl ? 
-                `<a href="${cleanBlogUrl}" target="_blank" class="btn-action btn-blog">N 네이버 블로그로 보기</a>` : '';
+            // 네이버 블로그 링크 처리 (안전장치 적용)
+            const blogUrl = fixUrl(item.blog_url);
+            const blogBtn = blogUrl ? `<a href="${blogUrl}" target="_blank" class="btn-action btn-blog"><i class="fa-solid fa-blog"></i> &nbsp;블로그 보기</a>` : '';
 
-            // [수정됨] 상세 설명이 없으면 기본 설명 사용
-            const detailDesc = item.detail_text ? item.detail_text : item.description;
-
-            container.innerHTML = `
-                <div class="gallery-container">
-                    <div class="main-image-box">
-                        <img id="main-img" src="${mainImgUrl}" alt="${item.title}" onerror="this.src='bg.jpg'">
+            // 비슷한 매물 추천 (같은 카테고리 3개)
+            const similarItems = allListings.filter(l => l.category === item.category && l.title !== item.title).slice(0, 5);
+            let similarHtml = '';
+            similarItems.forEach(sim => {
+                similarHtml += `
+                    <div class="similar-card" onclick="location.href='detail.html?title=' + encodeURIComponent('${sim.title}')">
+                        <div class="similar-img"><img src="${convertDriveLink(sim.images?sim.images.split('|')[0]:'')}" onerror="this.src='bg.jpg'"></div>
+                        <div class="similar-info">
+                            <div class="similar-price">${sim.price}</div>
+                            <div class="similar-title">${sim.title}</div>
+                        </div>
                     </div>
-                    ${thumbsHtml}
+                `;
+            });
+
+            const html = `
+                <div class="image-section">
+                    <span class="img-badge">${item.status}</span>
+                    <img id="main-img" src="${imageList[0]}" class="main-img" onerror="this.src='bg.jpg'">
+                </div>
+                ${imageList.length > 1 ? `<div class="thumb-list">${thumbsHtml}</div>` : ''}
+
+                <div class="basic-info">
+                    <span class="cat-tag">#${item.category}</span>
+                    <div class="price-text">${item.price}</div>
+                    <div class="title-text">${item.title}</div>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-ruler-combined"></i></div>
+                            <div class="info-text"><div>면적</div><div>${item.info_area || '-'}</div></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-regular fa-building"></i></div>
+                            <div class="info-text"><div>층수</div><div>${item.info_floor || '-'}</div></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-truck-moving"></i></div>
+                            <div class="info-text"><div>입주가능일</div><div>${item.info_movein || '즉시 협의'}</div></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-square-parking"></i></div>
+                            <div class="info-text"><div>주차</div><div>${item.info_parking || '-'}</div></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-regular fa-compass"></i></div>
+                            <div class="info-text"><div>방향</div><div>${item.info_direction || '-'}</div></div>
+                        </div>
+                         <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-elevator"></i></div>
+                            <div class="info-text"><div>엘리베이터</div><div>${item.info_elevator || '-'}</div></div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-restroom"></i></div>
+                            <div class="info-text"><div>화장실</div><div>${item.info_restroom || '-'}</div></div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="detail-header">
-                    <span class="detail-status-badge">${item.status} | ${item.category}</span>
-                    <div class="detail-price">${item.price}</div>
-                    <h1 class="detail-title">${item.title}</h1>
+                <div class="section">
+                    <div class="sec-title"><i class="fa-solid fa-quote-left" style="color:#ddd;"></i> 중개사 코멘트</div>
+                    <div class="desc-box">${item.description}</div>
                 </div>
 
-                <table class="info-table">
-                    <tr>
-                        <th>위치(소재지)</th>
-                        <td>${item.info_loc || '-'}</td>
-                    </tr>
-                    <tr>
-                        <th>면적</th>
-                        <td>${item.info_area || '-'}</td>
-                    </tr>
-                    <tr>
-                        <th>임대/거래 조건</th>
-                        <td>${item.price} <br> <span style="font-size:0.9rem; color:#666;">(부가세 별도)</span></td>
-                    </tr>
-                    <tr>
-                        <th>용도 / 주차</th>
-                        <td>${item.info_use || '-'}</td>
-                    </tr>
-                    <tr>
-                        <th>특이사항 / 입주</th>
-                        <td>${item.info_etc || '-'}</td>
-                    </tr>
-                </table>
-                
-                <div class="desc-box">
-                    <h3>매물 상세 설명</h3>
-                    <div class="detail-desc">${detailDesc}</div>
+                <div class="section">
+                    <div class="sec-title">위치 정보</div>
+                    <div class="map-box">
+                        <span class="address-text"><i class="fa-solid fa-location-dot" style="color:#e74c3c;"></i> ${item.info_loc || '세종특별자치시'}</span>
+                        <a href="https://map.naver.com/v5/search/${encodeURIComponent(item.info_loc || '세종시 찬스부동산')}" target="_blank" class="btn-map">
+                            네이버 지도로 보기 >
+                        </a>
+                    </div>
                 </div>
-                
-                <div class="action-buttons">
-                    <a href="tel:044-864-4953" class="btn-action btn-call">📞 전화 문의하기</a>
-                    ${blogBtnHtml}
+
+                ${similarItems.length > 0 ? `
+                <div class="section" style="border:none;">
+                    <div class="sec-title">이런 매물은 어때요?</div>
+                    <div class="similar-list">${similarHtml}</div>
+                </div>` : ''}
+
+                <div class="bottom-bar">
+                    <a href="tel:044-864-4953" class="btn-action btn-call"><i class="fa-solid fa-phone"></i> &nbsp;전화 문의</a>
+                    ${blogBtn}
                 </div>
             `;
+
+            document.getElementById('app').innerHTML = html;
         }
     </script>
 </body>
