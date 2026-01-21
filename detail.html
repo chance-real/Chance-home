@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* 스타일은 그대로 유지 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Noto Sans KR', sans-serif; color: #333; line-height: 1.6; background-color: #f5f7fa; padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
@@ -84,7 +83,8 @@
 
     <script>
         // ==========================================
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSj9TOA__l0xoYFmfSGDJ8pfDzsGso0Iisub8EjjyGUaQJUaNIjVMp8qcWr6YIUxhuCU7Hj2EEBw31D/pub?output=csv'; 
+        // [업데이트] 사장님 스크린샷에 있는 '진짜 게시 주소'입니다!
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgfWKmQ-Tjpm_mMdqKcgwvfVbCJZwl_HArZF3o6ZOjdR_1Xn3xvTlr1fwDw6EiDaaRo/pub?output=csv'; 
         // ==========================================
 
         function fixUrl(url) {
@@ -99,7 +99,6 @@
             return urlParams.get(name);
         }
 
-        // [중요] 빈칸도 정확히 읽어내는 강력한 CSV 해석기
         function csvToJSON(csv) {
             const lines = csv.split("\n");
             const result = [];
@@ -113,7 +112,6 @@
                 let current = '';
                 let inQuote = false;
                 
-                // 한 글자씩 분석해서 쉼표와 따옴표를 정확히 구분
                 for (let char of lines[i]) {
                     if (char === '"') {
                         inQuote = !inQuote;
@@ -124,12 +122,10 @@
                         current += char;
                     }
                 }
-                row.push(current.trim()); // 마지막 칸 추가
+                row.push(current.trim());
 
-                // 헤더와 데이터 짝지어주기
                 headers.forEach((header, index) => {
                     let val = row[index] || '';
-                    // 따옴표 제거 (엑셀이 자동으로 붙인 것들)
                     val = val.replace(/^"|"$/g, '').replace(/""/g, '"');
                     obj[header] = val;
                 });
@@ -182,7 +178,6 @@
             const blogUrl = fixUrl(item.blog_url);
             const blogBtn = blogUrl ? `<a href="${blogUrl}" target="_blank" class="btn-action btn-blog"><i class="fa-solid fa-blog"></i> &nbsp;블로그 보기</a>` : '';
 
-            // 비슷한 매물 추천 로직
             let similarItems = allListings.filter(l => l.category === item.category && l.title !== item.title);
             const sameStatusItems = similarItems.filter(l => l.status === item.status);
             const otherItems = similarItems.filter(l => l.status !== item.status);
@@ -201,7 +196,6 @@
                 `;
             });
 
-            // 지도 검색어 설정 (주소 값이 있으면 사용, 없으면 기본값)
             const mapQuery = item.info_loc ? item.info_loc : '세종특별자치시 찬스부동산';
 
             const html = `
