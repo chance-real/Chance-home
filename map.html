@@ -13,7 +13,7 @@
         .btn-home { font-weight: 700; color: #333; text-decoration: none; padding: 8px 15px; border: 1px solid #ddd; border-radius: 20px; background: white; }
         
         #map-container { width: 100vw; height: 100vh; }
-        .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index:50; background:rgba(255,255,255,0.9); padding:20px; border-radius:10px; font-weight: 700;}
+        .loading { position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); z-index:50; background:rgba(255,255,255,0.9); padding:20px; border-radius:10px; font-weight: 700; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
     </style>
     <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=c738valkgy&submodules=geocoder"></script>
 </head>
@@ -24,11 +24,11 @@
     </header>
 
     <div id="map-container"></div>
-    <div class="loading">매물을 지도에 표시 중입니다...</div>
+    <div class="loading" id="loading-msg">매물 정보를 불러오는 중입니다...</div>
 
     <script>
-        // [중요] 구글 시트 주소
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgfWKmQ-Tjpm_mMdqKcgwvfVbCJZwl_HArZF3o6ZOjdR_1Xn3xvTlr1fwDw6EiDaaRo/pub?output=csv'; 
+        // [수정 완료] 새 구글 시트 주소
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgFWKmQ-Tjpm_mMDqKcgwvfVbCJZwI_HARzF3o6Z0jdR_1Xn3XvTIr1fwDw6EiDaaRo/pub?gid=0&single=true&output=csv'; 
 
         function csvToJSON(csv) {
             const lines = csv.split("\n");
@@ -57,24 +57,44 @@
         }
 
         function initMap(listings) {
-            document.querySelector('.loading').style.display = 'none';
             // 세종시청 부근 중심
             var map = new naver.maps.Map('map-container', {
                 center: new naver.maps.LatLng(36.4800, 127.2890), 
                 zoom: 13
             });
 
-            listings.forEach(item => {
-                if (!item.address) return;
+            let loadedCount = 0;
+            const validListings = listings.filter(item => item.address && item.title);
+
+            if(validListings.length === 0) {
+                document.getElementById('loading-msg').innerText = "지도에 표시할 매물이 없습니다.";
+                return;
+            }
+
+            validListings.forEach(item => {
                 naver.maps.Service.geocode({ query: item.address }, function(status, response) {
+                    loadedCount++;
+                    if(loadedCount === validListings.length) {
+                         document.getElementById('loading-msg').style.display = 'none';
+                    }
+
                     if (status !== naver.maps.Service.Status.OK) return;
+                    
                     var result = response.v2.addresses[0];
+                    if(!result) return; // 주소 결과가 없으면 패스
+
                     var coords = new naver.maps.LatLng(result.y, result.x);
                     
                     var marker = new naver.maps.Marker({
                         position: coords,
                         map: map,
-                        title: item.title
+                        title: item.title,
+                        icon: {
+                            content: `<div style="background:white; padding:5px 10px; border:1px solid #333; border-radius:15px; font-weight:bold; font-size:0.8rem; box-shadow:0 2px 5px rgba(0,0,0,0.2); white-space:nowrap;">
+                                        ${item.price || '가격문의'}
+                                      </div>`,
+                            anchor: new naver.maps.Point(20, 20)
+                        }
                     });
 
                     naver.maps.Event.addListener(marker, 'click', function() {
@@ -85,7 +105,7 @@
         }
 
         if (typeof naver === 'undefined') {
-            alert("네이버 지도 API 키가 없거나 틀렸습니다. (Client ID 확인 필요)");
+            alert("지도 로딩 실패: 네이버 클라우드 콘솔에서 'Web Service URL'에 현재 사이트 주소를 등록해주세요.");
         } else {
             fetch(sheetUrl + '&t=' + new Date().getTime())
                 .then(res => res.text())
@@ -94,7 +114,8 @@
                     initMap(listings);
                 })
                 .catch(err => {
-                    alert("데이터 로딩 실패: 구글 시트 설정을 확인하세요.");
+                    console.error(err);
+                    alert("데이터 로딩 실패: 구글 시트 주소를 확인하세요.");
                 });
         }
     </script>
