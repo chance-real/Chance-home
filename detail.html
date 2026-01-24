@@ -18,15 +18,15 @@
 
         .container { max-width: 800px; margin: 30px auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 1px solid #eee; }
         
-        /* [수정] 갤러리 배경을 검은색으로 변경 (사진 집중도 향상) */
+        /* 갤러리 배경: 검은색 (사진 집중도 UP, 영화관 느낌) */
         .gallery-wrapper { position: relative; background: #000; border-bottom: 1px solid #eee; }
         
-        /* [수정] 사진 높이 500px 고정 */
+        /* [안전장치 1] 사진 틀 높이 550px 고정 (절대 안 작아짐) */
         .img-container { 
             display: flex; 
             overflow-x: auto; 
             scroll-snap-type: x mandatory; 
-            height: 500px; 
+            height: 550px; 
             scrollbar-width: none; 
             align-items: center; 
         }
@@ -42,10 +42,7 @@
             align-items: center;     
         }
         
-        /* [핵심 수정] 
-           1. width/height 100%: 작은 사진도 틀에 맞춰 커짐 
-           2. object-fit: contain: 사진 비율 유지하며 꽉 채움 (잘림 없음)
-        */
+        /* [안전장치 2] 무조건 꽉 차게 늘리기 + 비율 유지 (contain) */
         .img-item img { 
             width: 100%;      
             height: 100%;     
@@ -88,7 +85,8 @@
     </div>
 
     <script>
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgFWKmQ-Tjpm_mMDqKcgwvfVbCJZwI_HARzF3o6Z0jdR_1Xn3XvTIr1fwDw6EiDaaRo/pub?gid=0&single=true&output=csv'; 
+        // [중요] 사장님 시트 주소
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgfWKmQ-Tjpm_mMdqKcgwvfVbCJZwl_HArZF3o6ZOjdR_1Xn3xvTlr1fwDw6EiDaaRo/pub?output=csv'; 
 
         function getParam(name) {
             const urlParams = new URLSearchParams(window.location.search);
@@ -124,6 +122,7 @@
         function getAllImages(imagesStr) {
             if (!imagesStr) return ['bg.jpg'];
             
+            // 줄바꿈, 콤마를 모두 파이프로 통일 후 분리
             const cleanStr = imagesStr.replace(/(\r\n|\n|\r)/gm, "|").replace(/,/g, "|");
             const rawLinks = cleanStr.split("|");
             
@@ -132,16 +131,18 @@
                 link = link.trim();
                 if (!link) continue;
 
-                // [강력한 화질 개선] ?type=... 부분을 정규식으로 확실하게 제거
+                // [안전장치 3] 원본 소환술: 썸네일 꼬리표(?type=...)를 무조건 잘라냄
                 if (link.includes('pstatic.net') || link.includes('blog.naver')) {
-                    link = link.replace(/\?type=.*$/, ''); 
+                    link = link.split('?')[0]; 
                 }
 
                 if (link.includes('drive.google.com')) {
                      const idMatch = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
                      if (idMatch && idMatch[1]) {
-                         // 구글 드라이브도 고화질 옵션(sz=w2000)으로 변경
+                         // 구글 드라이브도 고화질(w2000) 요청
                          validLinks.push(`https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w2000`);
+                     } else {
+                         validLinks.push(link);
                      }
                 } else if (link.startsWith('http')) {
                     validLinks.push(link);
