@@ -18,15 +18,14 @@
 
         .container { max-width: 800px; margin: 30px auto; background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05); border: 1px solid #eee; }
         
-        /* 갤러리 배경: 검은색 (사진 집중도 UP, 영화관 느낌) */
+        /* [개선] 갤러리 배경 검은색 & 높이 최적화 */
         .gallery-wrapper { position: relative; background: #000; border-bottom: 1px solid #eee; }
         
-        /* [안전장치 1] 사진 틀 높이 550px 고정 (절대 안 작아짐) */
         .img-container { 
             display: flex; 
             overflow-x: auto; 
             scroll-snap-type: x mandatory; 
-            height: 550px; 
+            height: 500px; 
             scrollbar-width: none; 
             align-items: center; 
         }
@@ -42,10 +41,12 @@
             align-items: center;     
         }
         
-        /* [안전장치 2] 무조건 꽉 차게 늘리기 + 비율 유지 (contain) */
+        /* [핵심] 화질 저하 없이 원본 비율 유지하며 꽉 채우기 */
         .img-item img { 
-            width: 100%;      
-            height: 100%;     
+            max-width: 100%;      
+            max-height: 100%;     
+            width: auto;
+            height: auto;
             object-fit: contain; 
             display: block;
         }
@@ -85,7 +86,7 @@
     </div>
 
     <script>
-        // [중요] 사장님 시트 주소
+        // [설정] 사장님 구글 시트 주소
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vReD8rkzPZ_5ZgfWKmQ-Tjpm_mMdqKcgwvfVbCJZwl_HArZF3o6ZOjdR_1Xn3xvTlr1fwDw6EiDaaRo/pub?output=csv'; 
 
         function getParam(name) {
@@ -93,26 +94,48 @@
             return urlParams.get(name);
         }
 
+        // [중요 업그레이드] 콤마, 줄바꿈, 따옴표가 있어도 절대 깨지지 않는 강력한 CSV 파서
         function csvToJSON(csv) {
-            const lines = csv.split("\n");
-            const result = [];
-            const headers = lines[0].split(",").map(h => h.trim());
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                const obj = {};
-                let row = [];
-                let current = '';
-                let inQuote = false;
-                for (let char of lines[i]) {
-                    if (char === '"') inQuote = !inQuote;
-                    else if (char === ',' && !inQuote) { row.push(current.trim()); current = ''; }
-                    else current += char;
+            const rows = [];
+            let row = [];
+            let inQuote = false;
+            let current = '';
+            
+            for (let i = 0; i < csv.length; i++) {
+                const char = csv[i];
+                const nextChar = csv[i+1];
+
+                if (char === '"') {
+                    if (inQuote && nextChar === '"') {
+                        current += '"';
+                        i++; // Skip next quote
+                    } else {
+                        inQuote = !inQuote;
+                    }
+                } else if (char === ',' && !inQuote) {
+                    row.push(current);
+                    current = '';
+                } else if ((char === '\r' || char === '\n') && !inQuote) {
+                    if (current || row.length > 0) row.push(current);
+                    if (row.length > 0) rows.push(row);
+                    row = [];
+                    current = '';
+                    if (char === '\r' && nextChar === '\n') i++;
+                } else {
+                    current += char;
                 }
-                row.push(current.trim());
-                headers.forEach((header, index) => {
-                    let val = row[index] || '';
-                    val = val.replace(/^"|"$/g, '').replace(/""/g, '"');
-                    obj[header] = val;
+            }
+            if (current || row.length > 0) { row.push(current); rows.push(row); }
+
+            const result = [];
+            const headers = rows[0].map(h => h.trim()); // 헤더
+            
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = rows[i];
+                if (rowData.length < headers.length) continue; 
+                const obj = {};
+                headers.forEach((h, idx) => {
+                    obj[h] = (rowData[idx] || '').trim();
                 });
                 result.push(obj);
             }
@@ -131,7 +154,7 @@
                 link = link.trim();
                 if (!link) continue;
 
-                // [안전장치 3] 원본 소환술: 썸네일 꼬리표(?type=...)를 무조건 잘라냄
+                // [화질 개선의 끝판왕] ?type=... 꼬리표를 무조건 제거하여 원본 강제 호출
                 if (link.includes('pstatic.net') || link.includes('blog.naver')) {
                     link = link.split('?')[0]; 
                 }
@@ -139,10 +162,8 @@
                 if (link.includes('drive.google.com')) {
                      const idMatch = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
                      if (idMatch && idMatch[1]) {
-                         // 구글 드라이브도 고화질(w2000) 요청
-                         validLinks.push(`https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w2000`);
-                     } else {
-                         validLinks.push(link);
+                         // 구글 드라이브도 고화질(w2560) 요청
+                         validLinks.push(`https://drive.google.com/thumbnail?id=${idMatch[1]}&sz=w2560`);
                      }
                 } else if (link.startsWith('http')) {
                     validLinks.push(link);
@@ -161,13 +182,26 @@
         fetch(sheetUrl + '&t=' + new Date().getTime())
             .then(res => res.text())
             .then(text => {
-                const allListings = csvToJSON(text);
-                const item = allListings.find(i => i.title === targetTitle);
-                
-                if(item) renderDetail(item);
-                else {
-                    alert("매물을 찾을 수 없습니다.");
-                    location.href = 'listings.html';
+                try {
+                    const allListings = csvToJSON(text);
+                    // 제목 비교 시 앞뒤 공백 제거하여 정확도 향상
+                    const item = allListings.find(i => i.title.trim() === targetTitle.trim());
+                    
+                    if(item) {
+                        renderDetail(item);
+                    } else {
+                        console.log("찾으려는 제목:", targetTitle);
+                        console.log("엑셀 데이터 목록:", allListings);
+                        document.getElementById('detail-container').innerHTML = `
+                            <div style="padding:50px; text-align:center;">
+                                <h3>매물을 찾을 수 없습니다.</h3>
+                                <p>제목이 정확한지 확인해주세요.<br>현재 검색어: ${targetTitle}</p>
+                                <a href="listings.html" class="blog-btn" style="margin-top:20px;">목록으로 돌아가기</a>
+                            </div>`;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert("데이터 처리 중 오류가 발생했습니다.");
                 }
             });
 
@@ -175,10 +209,11 @@
             const images = getAllImages(item.images || item.image);
             let imagesHtml = '';
             
+            // [렉 방지] loading="lazy" 추가하여 화면에 보일 때만 로딩
             images.forEach((imgUrl, index) => {
                 imagesHtml += `
                     <div class="img-item">
-                        <img src="${imgUrl}" alt="${item.title}" onerror="this.src='bg.jpg'" referrerpolicy="no-referrer">
+                        <img src="${imgUrl}" alt="${item.title}" loading="lazy" onerror="this.src='bg.jpg'" referrerpolicy="no-referrer">
                     </div>`;
             });
 
