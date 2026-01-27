@@ -9,7 +9,7 @@
     <title>찬스부동산 - 세종시 고운뜰7길9</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
-        /* ================= 공통 스타일 ================= */
+        /* ================= 원본 스타일 100% 유지 ================= */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { font-family: 'Noto Sans KR', sans-serif; color: #333; line-height: 1.6; background-color: #fcfcfc; }
@@ -129,16 +129,32 @@
         .fixed-qr img { width: 120px; height: auto; display: block; margin-bottom: 8px; }
         .fixed-qr p { font-size: 0.9rem; color: var(--chance-dark); font-weight: 700; margin: 0; }
 
-        /* 모바일 반응형 */
+        /* [개선] 모바일 최적화 미디어 쿼리 */
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
-            header { flex-direction: column; gap: 15px; }
+            header { position: relative; flex-direction: column; padding: 10px 5%; gap: 15px; } /* [수정] 고정 해제 */
+            .logo img { height: 45px; }
+            .nav-menu { 
+                display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; font-size: 0.8rem;
+            }
+            .nav-menu a { 
+                justify-content: center; background: #fff; border: 1px solid #eee; padding: 10px 5px; border-radius: 8px; 
+                white-space: nowrap; /* [수정] 글자 잘림 방지 */
+            }
+            .btn-register { grid-column: 1 / -1; order: -1; width: 100%; justify-content: center; background-color: var(--chance-blue) !important; }
+            .btn-premium { grid-column: 1 / -1; order: -2; background: #f8fbff !important; margin: 0; }
+            
+            /* [중요 수정] 모바일 타이틀 단어 잘림 방지 */
+            .hero h1 { 
+                font-size: 2.2rem; 
+                word-break: keep-all; /* 한글 단어 중간에서 잘리는 것 방지 */
+            }
+            .hero h1 span {
+                display: inline-block; /* '찬스메이커'가 한 줄로 유지되도록 설정 */
+            }
+            
             .footer-info-grid { grid-template-columns: 1fr; }
             .fixed-qr { bottom: 10px; right: 10px; padding: 10px; }
             .fixed-qr img { width: 90px; }
-            .nav-menu { flex-wrap: wrap; justify-content: center; }
-            /* 모바일에서 프리미엄 버튼 위치 조정 */
-            .btn-premium { order: -1; margin-bottom: 10px; }
         }
     </style>
 </head>
